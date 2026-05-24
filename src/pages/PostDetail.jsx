@@ -11,6 +11,10 @@ const PostContainer = styled.article`
   border-radius: 8px;
   padding: 2rem;
   margin-top: 1rem;
+
+  @media (max-width: 576px) {
+    padding: 1.5rem 1rem;
+  }
 `;
 
 const BackButton = styled.button`
@@ -44,6 +48,10 @@ const Title = styled.h1`
   font-size: 2.2rem;
   color: var(--color-text-main);
   margin-bottom: 1rem;
+
+  @media (max-width: 576px) {
+    font-size: 1.6rem;
+  }
 `;
 
 const Meta = styled.div`

@@ -1,7 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
 import { NavLink, Link } from 'react-router-dom';
-import { Scale, BookOpen, PenTool, Mail, Menu } from 'lucide-react';
+import { Scale, BookOpen, PenTool, Mail, Menu, X } from 'lucide-react';
 
 const HeaderContainer = styled.header`
   background-color: var(--color-bg);
@@ -96,12 +96,33 @@ const MobileMenuButton = styled.button`
   }
 `;
 
+const MobileNavLinks = styled.div`
+  position: absolute;
+  top: var(--header-height);
+  left: 0;
+  right: 0;
+  background-color: var(--color-bg);
+  border-bottom: 1px solid var(--color-border);
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  gap: 0.5rem;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
+  z-index: 99;
+
+  @media (min-width: 769px) {
+    display: none;
+  }
+`;
+
 export function Header() {
+  const [isOpen, setIsOpen] = useState(false);
+
   return (
     <HeaderContainer>
       <NavContent>
         <LogoContainer>
-          <Logo to="/">
+          <Logo to="/" onClick={() => setIsOpen(false)}>
             Sensibilidade <span>&</span> Razão
           </Logo>
         </LogoContainer>
@@ -129,11 +150,35 @@ export function Header() {
         </NavLinks>
 
         <RightContainer>
-          <MobileMenuButton>
-            <Menu size={24} />
+          <MobileMenuButton onClick={() => setIsOpen(!isOpen)}>
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </MobileMenuButton>
         </RightContainer>
       </NavContent>
+
+      {isOpen && (
+        <MobileNavLinks>
+          <StyledNavLink to="/" end onClick={() => setIsOpen(false)}>
+            Apresentação
+          </StyledNavLink>
+          <StyledNavLink to="/advogado" onClick={() => setIsOpen(false)}>
+            <Scale size={18} />
+            Advogado
+          </StyledNavLink>
+          <StyledNavLink to="/professor" onClick={() => setIsOpen(false)}>
+            <BookOpen size={18} />
+            Professor
+          </StyledNavLink>
+          <StyledNavLink to="/poeta" onClick={() => setIsOpen(false)}>
+            <PenTool size={18} />
+            Poeta (Arte)
+          </StyledNavLink>
+          <StyledNavLink to="/contato" onClick={() => setIsOpen(false)}>
+            <Mail size={18} />
+            Contato
+          </StyledNavLink>
+        </MobileNavLinks>
+      )}
     </HeaderContainer>
   );
 }

@@ -1,37 +1,11 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import styled from 'styled-components';
+import { PageHeader, InfoBox } from '../styles/advogadostyle';
 import { Feed } from '../components/Feed';
 import { MOCK_POSTS } from '../data/mockData';
 import { Scale } from 'lucide-react';
 
-const PageHeader = styled.div`
-  display: flex;
-  align-items: center;
-  gap: 1rem;
-  margin-bottom: 2rem;
-  padding-bottom: 1rem;
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-main);
-`;
 
-const InfoBox = styled.div`
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 2rem;
-  font-size: 0.95rem;
-
-  ul {
-    list-style: none;
-    margin-top: 0.5rem;
-    
-    li {
-      margin-bottom: 0.5rem;
-    }
-  }
-`;
 
 export function Advogado() {
   const posts = MOCK_POSTS.filter(post => post.category === 'advogado');

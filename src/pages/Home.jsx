@@ -1,6 +1,6 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { HomeContainer, ProfileSection, ProfileImagePlaceholder, Title, Subtitle, Bio } from '../styles/homeStyle';
+import { HomeContainer, ProfileSection, ProfileImagePlaceholder, Title, Subtitle, Bio } from '../styles/homeStyle.jsx';
 import { Feed } from '../components/Feed';
 import { MOCK_POSTS } from '../data/mockData';
 import fotoPerfil from '../assets/imagemHomeLeo.jpg';
