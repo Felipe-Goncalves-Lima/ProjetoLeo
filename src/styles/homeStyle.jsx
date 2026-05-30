@@ -33,18 +33,13 @@ export const ProfileImagePlaceholder = styled.div`
   width: 100%;
   max-width: 450px;
   aspect-ratio: 3 / 4;
-  border-radius: 20%;
-  background-color: var(--color-bg-secondary);
   margin: 0 auto 1.5rem;
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  border-radius: 40%;
+  overflow: hidden;
+  position: relative;
 
   color: var(--color-text-muted);
   font-size: 0.9rem;
-
-  overflow: hidden;
 
   @media (max-width: 992px) {
     max-width: 380px;
@@ -114,3 +109,4 @@ export const Bio = styled.p`
     text-align: left;
   }
 `;
+

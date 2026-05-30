@@ -3,7 +3,7 @@ import { Helmet } from 'react-helmet-async';
 import { HomeContainer, ProfileSection, ProfileImagePlaceholder, Title, Subtitle, Bio } from '../styles/homeStyle.jsx';
 import { Feed } from '../components/Feed';
 import { MOCK_POSTS } from '../data/mockData';
-import fotoPerfil from '../assets/imagemHomeLeo.jpg';
+import fotoPerfil from '../assets/leoHome.webp';
 
 
 
@@ -17,14 +17,19 @@ export function Home() {
 
       <ProfileSection>
         <ProfileImagePlaceholder>
-          <img src={fotoPerfil} alt="Foto de perfil de Leonardo Caffaro" style={{ width: '100%', height: '100%', borderRadius: '15%', objectFit: 'cover', border: '4px solid var(--color-border)' }} />
+          <img src={fotoPerfil} alt="Foto de perfil de Leonardo Caffaro" style={{ width: '100%', height: '100%', objectFit: 'cover'}} />
         </ProfileImagePlaceholder>
         <Title>Leonardo Caffaro</Title>
         <Subtitle style={{ color: '#101a8bd7' }}>Advogado, Professor e Poeta (Arte)</Subtitle>
-        <Bio>
+        <Bio style={{ textAlign: 'center', fontSize: '1.2rem'}}>
           Bem-vindo ao espaço <strong style={{ color: '#E63946' }}>Sensibilidade e Razão</strong>. Aqui compartilho minhas reflexões 
           jurídicas, materiais acadêmicos e produções poéticas e musicais. 
-          Acredito que a verdadeira justiça só se alcança quando a razão e a sensibilidade andam de mãos dadas.
+          Acredito que a verdadeira justiça só se alcança quando a razão e a sensibilidade andam de mãos dadas<br/><br/>
+          <strong style={{color: '#E63946'}}>Do Autor:</strong> Leonardo de Mello Caffaro é Advogado Público, 
+          na condição de Procurador Federal da Advocacia Geral da União-AGU, vindo ampliando continuamente 
+          sua participação acadêmica, social e cultural, como Professor e Poeta (Arte) <br/><br/>
+          <span style={{ color: '#E63946', marginRight: '119px' }}><strong>Meu lattes:</strong> <a href="https://lattes.cnpq.br/4791462285750057leonardocaffaro@gmail.com">Lattes Leonardo Caffaro (clique aqui)</a></span><br/>
+          <span style={{ color: '#E63946', marginRight: '120px' }}><strong>Meu Orcid: </strong><a href="https://orcid.org/0009-0006-9960-6556">Orcid: Leonardo Caffaro (clique aqui)</a></span>
         </Bio>
       </ProfileSection>
 
