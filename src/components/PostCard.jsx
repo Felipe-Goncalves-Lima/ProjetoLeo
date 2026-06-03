@@ -1,139 +1,136 @@
-import React from 'react';
+import React, { useState } from 'react';
 import styled from 'styled-components';
-import { Link } from 'react-router-dom';
-import { MessageCircle, ThumbsUp, Share2 } from 'lucide-react';
-
-const Card = styled.article`
-  background: var(--color-bg);
-  border: 1px solid var(--color-border);
-  border-radius: 8px;
-  padding: 1.5rem;
-  margin-bottom: 1.5rem;
-  box-shadow: 0 1px 2px rgba(0,0,0,0.05);
-`;
-
-const PostHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
-  margin-bottom: 1rem;
-`;
-
-const AuthorInfo = styled.div`
-  display: flex;
-  flex-direction: column;
-`;
-
-const AuthorName = styled.span`
-  font-weight: 600;
-  color: var(--color-text-main);
-`;
-
-const PostDate = styled.span`
-  font-size: 0.85rem;
-  color: var(--color-text-muted);
-`;
-
-const CategoryBadge = styled.span`
-  font-size: 0.75rem;
-  font-weight: 600;
-  text-transform: uppercase;
-  color: var(--color-primary-blue);
-  background: var(--color-bg-secondary);
-  padding: 0.2rem 0.6rem;
-  border-radius: 12px;
-  height: fit-content;
-`;
-
-const PostTitle = styled.h2`
-  font-size: 1.4rem;
-  margin-bottom: 0.8rem;
-  
-  a {
-    color: var(--color-text-main);
-    text-decoration: none;
-    
-    &:hover {
-      color: var(--color-primary-blue);
-    }
-  }
-`;
-
-const PostPreview = styled.p`
-  color: var(--color-text-main);
-  margin-bottom: 1rem;
-  white-space: pre-line;
-  display: -webkit-box;
-  -webkit-line-clamp: 3;
-  -webkit-box-orient: vertical;
-  overflow: hidden;
-`;
-
-const ReadMore = styled(Link)`
-  color: var(--color-primary-red);
-  font-weight: 600;
-  font-size: 0.9rem;
-  display: inline-block;
-  margin-bottom: 1rem;
-`;
-
-const InteractionBar = styled.div`
-  display: flex;
-  border-top: 1px solid var(--color-border);
-  padding-top: 1rem;
-  gap: 1.5rem;
-`;
-
-const InteractionButton = styled.button`
-  background: none;
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
-  color: var(--color-text-muted);
-  font-weight: 600;
-  font-size: 0.9rem;
-  padding: 0.5rem;
-  border-radius: 4px;
-
-  &:hover {
-    background: var(--color-bg-secondary);
-  }
-`;
+import { Link, useNavigate } from 'react-router-dom';
+import { MessageCircle, ThumbsUp, Share2, Edit2, Trash2 } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { deletePost } from '../services/api';
+import {
+  Card,
+  PostHeader,
+  AuthorInfo,
+  AuthorName,
+  PostDate,
+  CategoryBadge,
+  PostTitle,
+  PostPreview,
+  InteractionBar,
+  InteractionButton
+} from './style/postcardstyle';
 
 export function PostCard({ post }) {
-  const postUrl = `/${post.category}/${post.slug}`;
+  const navigate = useNavigate();
+  const { user, isAuthenticated } = useAuth();
+  const [liked, setLiked] = useState(false);
+  const [likesCount, setLikesCount] = useState(post.likes ?? 0);
+
+  const categorySlug = typeof post.category === 'object' ? post.category?.slug : post.category;
+  const categoryName = typeof post.category === 'object' ? post.category?.name : post.category;
+  const authorName = typeof post.author === 'object' ? post.author?.name : (post.author || 'Leonardo Caffaro');
+  const postDate = post.createdAt || post.date;
+  const commentsCount = post._count?.comments ?? post.comments?.length ?? 0;
+  const postUrl = `/${categorySlug}/${post.slug}`;
 
   return (
     <Card>
-      <PostHeader>
+      <PostHeader onClick={() => navigate(postUrl)} style={{ cursor: 'pointer' }}>
         <AuthorInfo>
-          <AuthorName  style={{ color: '#333C9B' }}>{post.author}</AuthorName>
-          <PostDate>{new Date(post.date).toLocaleDateString('pt-BR')}</PostDate>
+          <AuthorName style={{ color: '#333C9B' }}>{authorName}</AuthorName>
+          <PostDate>{postDate ? new Date(postDate).toLocaleDateString('pt-BR') : ''}</PostDate>
         </AuthorInfo>
-        <CategoryBadge style={{ color: '#333C9B' }}>{post.category}</CategoryBadge>
+        <CategoryBadge style={{ color: '#333C9B' }}>{categoryName}</CategoryBadge>
       </PostHeader>
+
       <PostTitle>
         <Link to={postUrl} style={{ color: '#E63946' }}>{post.title}</Link>
       </PostTitle>
 
       <PostPreview>
-        {post.content}
+        {post.summary || post.content}
       </PostPreview>
-      
-      <ReadMore to={postUrl} style={{ color: '#E63946' }}>Continuar lendo...</ReadMore>
 
       <InteractionBar>
-        <InteractionButton>
+        <InteractionButton
+          onClick={() => {
+            setLiked(!liked);
+            setLikesCount(prev => liked ? prev - 1 : prev + 1);
+          }}
+          style={{ color: liked ? '#E63946' : 'var(--color-text-muted)' }}
+        >
           <ThumbsUp size={18} />
-          {post.likes}
+          {likesCount}
         </InteractionButton>
+
         <InteractionButton>
           <MessageCircle size={18} />
-          {post.comments?.length || 0}
+          {commentsCount}
         </InteractionButton>
-        <InteractionButton>
+
+        <InteractionButton
+          onClick={() =>
+            navigator.clipboard
+              .writeText(window.location.origin + postUrl)
+              .then(() => alert('Link copiado!'))
+          }
+        >
           <Share2 size={18} />
           Compartilhar
         </InteractionButton>
+
+        {isAuthenticated && user?.role === 'ADMIN' && (
+          <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.8rem' }}>
+            <button
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                navigate(`/admin/posts/editar/${post.slug}`);
+              }}
+              style={{
+                background: 'none',
+                color: 'var(--color-primary-blue)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.2rem',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}
+              title="Editar publicação"
+            >
+              <Edit2 size={14} /> Editar
+            </button>
+
+            <button
+              onClick={async (e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                if (window.confirm(`Tem certeza de que deseja excluir a publicação "${post.title}"?`)) {
+                  try {
+                    await deletePost(post.id);
+                    alert('Publicação excluída com sucesso.');
+                    window.location.reload();
+                  } catch (err) {
+                    alert(err.message || 'Erro ao excluir publicação.');
+                  }
+                }
+              }}
+              style={{
+                background: 'none',
+                color: 'var(--color-primary-red)',
+                border: 'none',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '0.2rem',
+                fontSize: '0.85rem',
+                fontWeight: '600'
+              }}
+              title="Excluir publicação"
+            >
+              <Trash2 size={14} /> Excluir
+            </button>
+          </div>
+        )}
       </InteractionBar>
     </Card>
   );

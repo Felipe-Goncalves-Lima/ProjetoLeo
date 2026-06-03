@@ -18,9 +18,9 @@ export const Tabs = styled.div`
 export const TabButton = styled.button`
   padding: 0.8rem 1.5rem;
   border-radius: 20px;
-  background: ${props => props.active ? 'var(--color-primary-blue)' : 'var(--color-bg)'};
-  color: ${props => props.active ? '#FFF' : 'var(--color-text-main)'};
-  border: 1px solid ${props => props.active ? 'var(--color-primary-blue)' : 'var(--color-border)'};
+  background: ${props => props.$active ? 'var(--color-primary-blue)' : 'var(--color-bg)'};
+  color: ${props => props.$active ? '#FFF' : 'var(--color-text-main)'};
+  border: 1px solid ${props => props.$active ? 'var(--color-primary-blue)' : 'var(--color-border)'};
   font-weight: 600;
   display: flex;
   align-items: center;
@@ -28,7 +28,7 @@ export const TabButton = styled.button`
   transition: all 0.2s;
 
   &:hover {
-    background: ${props => props.active ? 'var(--color-primary-blue)' : 'var(--color-bg-secondary)'};
+    background: ${props => props.$active ? 'var(--color-primary-blue)' : 'var(--color-bg-secondary)'};
   }
 `;
 

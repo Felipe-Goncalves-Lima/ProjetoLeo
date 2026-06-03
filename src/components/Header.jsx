@@ -1,122 +1,12 @@
 import React, { useState } from 'react';
-import styled from 'styled-components';
 import { NavLink, Link } from 'react-router-dom';
-import { Scale, BookOpen, PenTool, Mail, Menu, X } from 'lucide-react';
-
-const HeaderContainer = styled.header`
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-  height: var(--header-height);
-  display: flex;
-  align-items: center;
-`;
-
-const NavContent = styled.div`
-  width: 100%;
-  display: grid;
-  grid-template-columns: 1fr auto 1fr;
-  align-items: center;
-  padding: 0 2rem;
-
-  @media (max-width: 768px) {
-    display: flex;
-    justify-content: space-between;
-  }
-`;
-
-const LogoContainer = styled.div`
-  display: flex;
-  justify-content: flex-start;
-`;
-
-const RightContainer = styled.div`
-  display: flex;
-  justify-content: flex-end;
-`;
-
-const Logo = styled(Link)`
-  font-family: var(--font-serif);
-  font-size: 1.2rem;
-  font-weight: 700;
-  color: var(--color-primary-blue);
-  text-decoration: none;
-  padding-bottom: 3px;
-  
-  span {
-    color: var(--color-primary-red);
-  }
-
-  &:hover {
-    text-decoration: none;
-  }
-`;
-
-const NavLinks = styled.nav`
-  display: flex;
-  gap: 1.5rem;
-  justify-self: center;
-
-  @media (max-width: 768px) {
-    display: none;
-  }
-`;
-
-const StyledNavLink = styled(NavLink)`
-  color: var(--color-text-muted);
-  font-weight: 600;
-  font-size: 0.9rem;
-  display: flex;
-  align-items: center;
-  gap: 0.4rem;
-  padding: 0.5rem;
-  border-bottom: 2px solid transparent;
-  white-space: nowrap;
-
-  &:hover {
-    color: var(--color-primary-blue);
-    text-decoration: none;
-  }
-
-  &.active {
-    color: var(--color-primary-blue);
-    border-bottom: 2px solid var(--color-primary-red);
-  }
-`;
-
-const MobileMenuButton = styled.button`
-  display: none;
-  background: none;
-  color: var(--color-text-main);
-  
-  @media (max-width: 768px) {
-    display: block;
-  }
-`;
-
-const MobileNavLinks = styled.div`
-  position: absolute;
-  top: var(--header-height);
-  left: 0;
-  right: 0;
-  background-color: var(--color-bg);
-  border-bottom: 1px solid var(--color-border);
-  display: flex;
-  flex-direction: column;
-  padding: 1rem;
-  gap: 0.5rem;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.05);
-  z-index: 99;
-
-  @media (min-width: 769px) {
-    display: none;
-  }
-`;
+import { Scale, BookOpen, PenTool, Mail, Menu, X, LogIn, LogOut, User } from 'lucide-react';
+import { useAuth } from '../contexts/AuthContext';
+import { HeaderContainer, NavContent, LogoContainer, RightContainer, Logo, NavLinks, StyledNavLink, MobileMenuButton, AuthLink, UserInfo, LogoutButton, MobileNavLinks } from './style/headerstyle';
 
 export function Header() {
   const [isOpen, setIsOpen] = useState(false);
+  const { user, logout, isAuthenticated } = useAuth();
 
   return (
     <HeaderContainer>
@@ -149,7 +39,39 @@ export function Header() {
           </StyledNavLink>
         </NavLinks>
 
-        <RightContainer>
+        <RightContainer style={{ display: 'flex', alignItems: 'center', gap: '1rem' }}>
+          {isAuthenticated ? (
+            <UserInfo>
+              {user?.role === 'ADMIN' && (
+                <Link 
+                  to="/admin" 
+                  style={{ 
+                    color: 'var(--color-primary-red)', 
+                    fontWeight: 'bold', 
+                    fontSize: '0.9rem', 
+                    marginRight: '0.8rem',
+                    textDecoration: 'none',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '0.3rem'
+                  }}
+                >
+                  Painel Admin
+                </Link>
+              )}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-primary-blue)', fontWeight: '600' }}>
+                <User size={16} /> {user?.name}
+              </span>
+              <LogoutButton onClick={logout}>
+                <LogOut size={16} /> Sair
+              </LogoutButton>
+            </UserInfo>
+          ) : (
+            <AuthLink to="/login">
+              <LogIn size={16} /> Entrar
+            </AuthLink>
+          )}
+
           <MobileMenuButton onClick={() => setIsOpen(!isOpen)}>
             {isOpen ? <X size={24} /> : <Menu size={24} />}
           </MobileMenuButton>
@@ -177,6 +99,26 @@ export function Header() {
             <Mail size={18} />
             Contato
           </StyledNavLink>
+          
+          {isAuthenticated ? (
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem', padding: '0.5rem 0', borderTop: '1px solid var(--color-border)' }}>
+              {user?.role === 'ADMIN' && (
+                <StyledNavLink to="/admin" onClick={() => setIsOpen(false)} style={{ color: 'var(--color-primary-red)' }}>
+                  Painel Admin
+                </StyledNavLink>
+              )}
+              <span style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', color: 'var(--color-primary-blue)', fontWeight: '600', padding: '0.5rem' }}>
+                <User size={18} /> {user?.name}
+              </span>
+              <LogoutButton onClick={() => { logout(); setIsOpen(false); }} style={{ alignSelf: 'flex-start' }}>
+                <LogOut size={18} /> Sair
+              </LogoutButton>
+            </div>
+          ) : (
+            <StyledNavLink to="/login" onClick={() => setIsOpen(false)} style={{ borderTop: '1px solid var(--color-border)', paddingTop: '0.8rem' }}>
+              <LogIn size={18} /> Entrar
+            </StyledNavLink>
+          )}
         </MobileNavLinks>
       )}
     </HeaderContainer>

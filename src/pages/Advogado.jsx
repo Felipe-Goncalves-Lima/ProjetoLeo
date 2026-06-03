@@ -1,14 +1,14 @@
 import React from 'react';
 import { Helmet } from 'react-helmet-async';
-import { PageHeader, InfoBox } from '../styles/advogadostyle';
+import { PageHeader, InfoBox } from './styles/advogadostyle';
 import { Feed } from '../components/Feed';
-import { MOCK_POSTS } from '../data/mockData';
+import { usePosts } from '../hooks/usePosts';
 import { Scale } from 'lucide-react';
 
 
 
 export function Advogado() {
-  const posts = MOCK_POSTS.filter(post => post.category === 'advogado');
+  const { posts, loading, error } = usePosts({ categorySlug: 'advogado' });
 
   return (
     <div>
@@ -26,11 +26,11 @@ export function Advogado() {
         <h3 style={{ color: '#E63946' }}>Credenciais</h3>
         <ul>
           <li><strong style={{ color: '#333C9B' }}>OAB:</strong> XX.XXX/UF</li>
-          <li ><strong style={{ color: '#333C9B' }}>Lattes:</strong> <a href="#" target="_blank" rel="noreferrer">Acessar Currículo Lattes</a></li>
+          <li ><strong style={{ color: '#333C9B' }}>Lattes:</strong> <a href="https://lattes.cnpq.br/4791462285750057" target="_blank" rel="noreferrer">Acessar Currículo Lattes</a></li>
           <li><strong style={{ color: '#333C9B' }}>Especialidades:</strong> Direito Civil, Direito Digital, etc.</li>
         </ul>
       </InfoBox>
-      <Feed posts={posts} />
+      <Feed posts={posts} loading={loading} error={error} />
     </div>
   );
 }

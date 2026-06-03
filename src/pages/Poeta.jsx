@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
-import { PageHeader, Tabs, TabButton, SoundCloudPlaceholder } from '../styles/poetaStyle.jsx';
+import { PageHeader, Tabs, TabButton, SoundCloudPlaceholder } from './styles/poetaStyle.jsx';
 import { Feed } from '../components/Feed';
-import { MOCK_POSTS } from '../data/mockData';
+import { usePosts } from '../hooks/usePosts';
 import { PenTool, Music, Book } from 'lucide-react';
 
 
@@ -10,7 +10,11 @@ import { PenTool, Music, Book } from 'lucide-react';
 export function Poeta() {
   const [activeTab, setActiveTab] = useState('poesia');
 
-  const posts = MOCK_POSTS.filter(post => post.category === activeTab);
+  const { posts, loading, error } = usePosts(
+    activeTab === 'poesia'
+      ? { categoryType: 'POETA', subtype: 'Poesia' }
+      : { categoryType: 'POETA', subtype: 'Música' }
+  );
 
   return (
     <div>
@@ -21,18 +25,18 @@ export function Poeta() {
 
       <PageHeader>
         <PenTool size={32} color="var(--color-primary-blue)" />
-        <h1 style={{color: '#1D3557'}}>Poeta (Arte)</h1>
+        <h1 style={{ color: '#1D3557' }}>Poeta (Arte)</h1>
       </PageHeader>
 
       <Tabs>
-        <TabButton 
-          active={activeTab === 'poesia'} 
+        <TabButton
+          $active={activeTab === 'poesia'}
           onClick={() => setActiveTab('poesia')}
         >
           <Book size={18} /> Poesia
         </TabButton>
-        <TabButton 
-          active={activeTab === 'musica'} 
+        <TabButton
+          $active={activeTab === 'musica'}
           onClick={() => setActiveTab('musica')}
         >
           <Music size={18} /> Música
@@ -41,12 +45,12 @@ export function Poeta() {
 
       {activeTab === 'musica' && (
         <SoundCloudPlaceholder>
-          [Área reservada para Iframe do SoundCloud]<br/>
+          [Área reservada para Iframe do SoundCloud]<br />
           As músicas serão integradas diretamente do SoundCloud aqui para reprodução na página.
         </SoundCloudPlaceholder>
       )}
 
-      <Feed posts={posts} />
+      <Feed posts={posts} loading={loading} error={error} />
     </div>
   );
 }
