@@ -16,6 +16,8 @@ import {
   InteractionBar,
   InteractionButton
 } from './style/postcardstyle';
+import ShareButton from './sharebutton';
+
 
 export function PostCard({ post }) {
   const navigate = useNavigate();
@@ -64,17 +66,8 @@ export function PostCard({ post }) {
           <MessageCircle size={18} />
           {commentsCount}
         </InteractionButton>
-
-        <InteractionButton
-          onClick={() =>
-            navigator.clipboard
-              .writeText(window.location.origin + postUrl)
-              .then(() => alert('Link copiado!'))
-          }
-        >
-          <Share2 size={18} />
-          Compartilhar
-        </InteractionButton>
+        <ShareButton post={post} />
+        
 
         {isAuthenticated && user?.role === 'ADMIN' && (
           <div style={{ marginLeft: 'auto', display: 'flex', gap: '0.8rem' }}>
