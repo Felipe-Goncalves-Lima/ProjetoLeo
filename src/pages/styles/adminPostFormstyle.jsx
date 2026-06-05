@@ -156,3 +156,21 @@ export const AttachmentCard = styled.div`
   margin-bottom: 0.6rem;
   font-size: 0.9rem;
 `;
+
+export const ActionButton = styled.button`
+  background: ${props => props.bg || 'var(--color-bg-secondary)'};
+  border: 1px solid ${props => props.border || 'var(--color-border)'};
+  color: ${props => props.color || 'var(--color-text-main)'};
+  padding: 0.4rem;
+  border-radius: 4px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s;
+
+  &:hover {
+    opacity: 0.85;
+    background: ${props => props.hoverBg || 'var(--color-border)'};
+  }
+`;
