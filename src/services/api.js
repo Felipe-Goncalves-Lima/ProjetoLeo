@@ -1,9 +1,4 @@
-/**
- * Serviço centralizado de comunicação com a API do back-end.
- * Todas as chamadas passam pelo proxy Vite em /api (→ http://localhost:3001/api)
- */
-
-const BASE_URL = '/api';
+const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 
 async function request(path, options = {}) {
   const token = localStorage.getItem('token');
