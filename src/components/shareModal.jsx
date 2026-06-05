@@ -17,7 +17,7 @@ import TelegramIcon from "@mui/icons-material/Telegram";
 
 import { useState } from "react";
 
-import { StyledDialog } from "./style/sharemodalstyle";
+import { StyledDialog } from "./style/shareModalstyle";
 
 export default function ShareModal({ open, onClose, post }) {
   const [copied, setCopied] = useState(false);
