@@ -73,19 +73,21 @@ export async function unlikePost(postId) {
  * @param {{ authorName: string, authorEmail: string, content: string }} payload
  */
 export async function postComment(postId, payload) {
+  const guestToken = localStorage.getItem('guest_token');
+  const body = guestToken ? { ...payload, guestToken } : payload;
   const data = await request(`/comments/post/${postId}`, {
     method: 'POST',
-    body: JSON.stringify(payload),
+    body: JSON.stringify(body),
   });
   return data.data;
 }
 
-/**
- * @param {string} commentId
- */
 export async function deleteComment(commentId) {
+  const guestToken = localStorage.getItem('guest_token');
+  const headers = guestToken ? { 'x-guest-token': guestToken } : {};
   const data = await request(`/comments/${commentId}`, {
     method: 'DELETE',
+    headers,
   });
   return data;
 }

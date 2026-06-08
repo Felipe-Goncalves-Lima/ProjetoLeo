@@ -343,6 +343,14 @@ export function PostDetail() {
   const [editSubmitting, setEditSubmitting] = useState(false);
 
   useEffect(() => {
+    try {
+      if (!localStorage.getItem('guest_token')) {
+        localStorage.setItem('guest_token', crypto.randomUUID());
+      }
+    } catch {}
+  }, []);
+
+  useEffect(() => {
     let cancelled = false;
     setLiked(false);
 
@@ -683,7 +691,10 @@ export function PostDetail() {
             {localComments.length > 0 ? (
               localComments.map(c => {
                 const isEditing = editingCommentId === c.id;
-                const canManage = isAuthenticated && (user?.role === 'ADMIN' || user?.email === c.authorEmail);
+                const canEdit = isAuthenticated && (user?.role === 'ADMIN' || user?.email === c.authorEmail);
+                const guestToken = localStorage.getItem('guest_token');
+                const canDelete = (isAuthenticated && (user?.role === 'ADMIN' || user?.email === c.authorEmail))
+                  || (c.guestToken && c.guestToken === guestToken);
 
                 return (
                   <Comment key={c.id}>
@@ -693,30 +704,34 @@ export function PostDetail() {
                         <small>{c.createdAt ? new Date(c.createdAt).toLocaleDateString('pt-BR') : ''}</small>
                       </div>
                       
-                      {canManage && !isEditing && (
+                      {(canEdit || canDelete) && !isEditing && (
                         <CommentActions>
-                          <ActionButton 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              startEditing(c);
-                            }} 
-                            title="Editar comentário"
-                            color="var(--color-primary-blue)"
-                          >
-                            <Edit2 size={15} />
-                          </ActionButton>
-                          <ActionButton 
-                            onClick={(e) => {
-                              e.preventDefault();
-                              e.stopPropagation();
-                              handleDeleteComment(c.id);
-                            }} 
-                            title="Excluir comentário"
-                            color="var(--color-primary-red)"
-                          >
-                            <Trash2 size={15} />
-                          </ActionButton>
+                          {canEdit && (
+                            <ActionButton 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                startEditing(c);
+                              }} 
+                              title="Editar comentário"
+                              color="var(--color-primary-blue)"
+                            >
+                              <Edit2 size={15} />
+                            </ActionButton>
+                          )}
+                          {canDelete && (
+                            <ActionButton 
+                              onClick={(e) => {
+                                e.preventDefault();
+                                e.stopPropagation();
+                                handleDeleteComment(c.id);
+                              }} 
+                              title="Excluir comentário"
+                              color="var(--color-primary-red)"
+                            >
+                              <Trash2 size={15} />
+                            </ActionButton>
+                          )}
                         </CommentActions>
                       )}
                     </CommentHeader>
@@ -768,49 +783,75 @@ export function PostDetail() {
           </div>
 
           {post.allowComments !== false && (
-            isAuthenticated ? (
-              <CommentForm onSubmit={handleCommentSubmit}>
-                <h4 style={{ marginBottom: '0.2rem', color: 'var(--color-text-main)' }}>Deixe seu comentário</h4>
+            <CommentForm onSubmit={handleCommentSubmit}>
+              <h4 style={{ marginBottom: '0.2rem', color: 'var(--color-text-main)' }}>Deixe seu comentário</h4>
+              {isAuthenticated ? (
                 <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.2rem' }}>
                   Comentando como <strong>{user?.name}</strong> ({user?.email})
                 </p>
+              ) : (
+                <p style={{ fontSize: '0.85rem', color: 'var(--color-text-muted)', marginBottom: '1.2rem' }}>
+                  Você está comentando como visitante.
+                </p>
+              )}
 
-                {commentFeedback && (
-                  <AlertBox type={commentFeedback.type}>
-                    {commentFeedback.message}
-                  </AlertBox>
+              {commentFeedback && (
+                <AlertBox type={commentFeedback.type}>
+                  {commentFeedback.message}
+                </AlertBox>
+              )}
+
+              {!isAuthenticated && (
+                <FormRow>
+                  <FormGroup>
+                    <Label htmlFor="authorName">Nome</Label>
+                    <Input
+                      type="text"
+                      id="authorName"
+                      name="authorName"
+                      placeholder="Seu nome"
+                      value={commentForm.authorName}
+                      onChange={handleCommentChange}
+                      required
+                    />
+                  </FormGroup>
+                  <FormGroup>
+                    <Label htmlFor="authorEmail">E-mail</Label>
+                    <Input
+                      type="email"
+                      id="authorEmail"
+                      name="authorEmail"
+                      placeholder="seuemail@exemplo.com"
+                      value={commentForm.authorEmail}
+                      onChange={handleCommentChange}
+                      required
+                    />
+                  </FormGroup>
+                </FormRow>
+              )}
+
+              <FormGroup>
+                <Label htmlFor="content">Comentário</Label>
+                <TextArea
+                  id="content"
+                  name="content"
+                  placeholder="Escreva seu comentário..."
+                  value={commentForm.content}
+                  onChange={handleCommentChange}
+                  autoFocus={location.hash === '#comments'}
+                  required
+                />
+              </FormGroup>
+
+              <SubmitButton type="submit" disabled={commentSubmitting}>
+                {commentSubmitting ? (
+                  <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                ) : (
+                  <Send size={16} />
                 )}
-
-                <FormGroup>
-                  <Label htmlFor="content">Comentário</Label>
-                  <TextArea
-                    id="content"
-                    name="content"
-                    placeholder="Escreva seu comentário..."
-                    value={commentForm.content}
-                    onChange={handleCommentChange}
-                    autoFocus={location.hash === '#comments'}
-                  />
-                </FormGroup>
-
-                <SubmitButton type="submit" disabled={commentSubmitting}>
-                  {commentSubmitting ? (
-                    <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
-                  ) : (
-                    <Send size={16} />
-                  )}
-                  {commentSubmitting ? 'Enviando...' : 'Enviar Comentário'}
-                </SubmitButton>
-              </CommentForm>
-            ) : (
-              <LoginBanner>
-                <h4>Quer participar da conversa?</h4>
-                <p>Faça login no portal para enviar um comentário de forma rápida e segura.</p>
-                <LoginButtonLink to="/login" state={{ from: location }}>
-                  <LogIn size={16} /> Fazer Login
-                </LoginButtonLink>
-              </LoginBanner>
-            )
+                {commentSubmitting ? 'Enviando...' : 'Enviar Comentário'}
+              </SubmitButton>
+            </CommentForm>
           )}
         </CommentsSection>
 

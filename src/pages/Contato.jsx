@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import { PageHeader, ContactGrid, ContactInfo, InfoItem, ContactForm, FormGroup, Label, Input, TextArea, SubmitButton } from './styles/contatoStyle';
 import { Mail, Phone, Loader, CheckCircle, AlertCircle } from 'lucide-react';
@@ -20,7 +21,13 @@ const AlertBox = styled.div`
 `;
 
 export function Contato() {
-  const [form, setForm] = useState({ name: '', email: '', subject: '', message: '' });
+  const [searchParams] = useSearchParams();
+  const [form, setForm] = useState({
+    name: '',
+    email: '',
+    subject: searchParams.get('subject') || '',
+    message: searchParams.get('message') || ''
+  });
   const [submitting, setSubmitting] = useState(false);
   const [feedback, setFeedback] = useState(null);
 
