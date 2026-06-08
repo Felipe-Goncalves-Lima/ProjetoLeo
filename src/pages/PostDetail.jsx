@@ -5,6 +5,7 @@ import styled from 'styled-components';
 import { fetchPostBySlug, likePost, unlikePost, postComment, deleteComment, updateComment, deletePost } from '../services/api';
 import { ArrowLeft, MessageCircle, Share2, ThumbsUp, Send, Loader, LogIn, Edit2, Trash2, Check, X, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
+import ShareButton from '../components/sharebutton';
 
 const PostContainer = styled.article`
   background: var(--color-bg);
@@ -84,12 +85,12 @@ const InteractionButton = styled.button.attrs({ type: 'button' })`
   display: flex;
   align-items: center;
   gap: 0.5rem;
-  color: ${props => props.$active ? 'var(--color-primary-blue)' : 'var(--color-text-muted)'};
+  color: ${props => props.$active ? '#E63946' : 'var(--color-text-muted)'};
   font-weight: 600;
   transition: color 0.2s;
   
   &:hover {
-    color: var(--color-primary-blue);
+    color: ${props => props.$active ? '#E63946' : 'var(--color-primary-blue)'};
   }
 
   &:disabled {
@@ -673,9 +674,7 @@ export function PostDetail() {
           <InteractionButton>
             <MessageCircle size={18} /> {localComments.length}
           </InteractionButton>
-          <InteractionButton onClick={() => navigator.clipboard.writeText(window.location.href).then(() => alert('Link copiado!'))}>
-            <Share2 size={18} /> Compartilhar URL
-          </InteractionButton>
+          <ShareButton post={post} />
         </InteractionBar>
 
         <CommentsSection id="comments">
