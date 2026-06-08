@@ -3,7 +3,7 @@ import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
 import { fetchPostBySlug, likePost, postComment, deleteComment, updateComment, deletePost } from '../services/api';
-import { ArrowLeft, MessageCircle, Share2, ThumbsUp, Send, Loader, LogIn, Edit2, Trash2, Check, X } from 'lucide-react';
+import { ArrowLeft, MessageCircle, Share2, ThumbsUp, Send, Loader, LogIn, Edit2, Trash2, Check, X, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
 const PostContainer = styled.article`
@@ -488,6 +488,9 @@ export function PostDetail() {
 
   const categoryName = post.category?.name || post.category?.slug || category;
 
+  const images = post.media?.filter(m => m.type === 'IMAGE') || [];
+  const pdfs = post.media?.filter(m => m.type === 'PDF') || [];
+
   return (
     <div>
       <Helmet>
@@ -567,6 +570,54 @@ export function PostDetail() {
         )}
 
         <Content>{post.content}</Content>
+
+        {images.map(img => (
+          <div key={img.id} style={{ marginBottom: '2rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)', textAlign: 'center', background: 'var(--color-bg-secondary)' }}>
+            <img src={img.url} alt={img.originalName} style={{ display: 'block', margin: '0 auto', maxHeight: '600px', maxWidth: '100%', objectFit: 'contain' }} />
+          </div>
+        ))}
+
+        {pdfs.length > 0 && (
+          <div style={{ marginTop: '2rem', padding: '1.5rem', background: 'var(--color-bg-secondary)', borderRadius: '8px', border: '1px solid var(--color-border)', marginBottom: '2rem' }}>
+            <h3 style={{ fontSize: '1.1rem', marginBottom: '1rem', display: 'flex', alignItems: 'center', gap: '0.5rem', color: 'var(--color-primary-blue)', borderBottom: 'none', paddingBottom: 0 }}>
+              <FileText size={18} /> Documentos Anexos (PDF)
+            </h3>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.8rem' }}>
+              {pdfs.map(pdf => (
+                <a
+                  key={pdf.id}
+                  href={pdf.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'space-between',
+                    padding: '0.8rem 1rem',
+                    background: 'var(--color-bg)',
+                    border: '1px solid var(--color-border)',
+                    borderRadius: '6px',
+                    textDecoration: 'none',
+                    color: 'var(--color-text-main)',
+                    fontWeight: '600',
+                    fontSize: '0.9rem',
+                    transition: 'all 0.2s'
+                  }}
+                  onMouseOver={e => e.currentTarget.style.borderColor = 'var(--color-primary-blue)'}
+                  onMouseOut={e => e.currentTarget.style.borderColor = 'var(--color-border)'}
+                >
+                  <span style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                    <FileText size={16} style={{ color: 'var(--color-primary-red)', flexShrink: 0 }} />
+                    {pdf.originalName}
+                  </span>
+                  <span style={{ fontSize: '0.8rem', color: 'var(--color-text-muted)', flexShrink: 0 }}>
+                    Visualizar PDF
+                  </span>
+                </a>
+              ))}
+            </div>
+          </div>
+        )}
 
         <InteractionBar>
           <InteractionButton

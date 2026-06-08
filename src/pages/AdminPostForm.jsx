@@ -6,10 +6,12 @@ import {
   createPost, 
   updatePost, 
   uploadAttachment, 
-  deleteAttachment 
+  deleteAttachment,
+  uploadMedia,
+  deleteMedia
 } from '../services/api';
 import { ArrowLeft, Save, Loader, Paperclip, Trash2, Plus, FileText, Music, BookOpen, Scale } from 'lucide-react';
-import { FormContainer, Title, FeedbackMessage, FormGroup, Label, Input, Select, ActionButton, Button, SectionTitle, FormRow, TextArea, CheckboxRow, ButtonRow } from './styles/adminPostFormstyle';
+import { FormContainer, Title, FeedbackMessage, FormGroup, Label, Input, Select, ActionButton, Button, SectionTitle, FormRow, TextArea, CheckboxRow, ButtonRow, MediaCardList, MediaCardItem, MediaThumbnail, MediaIconWrapper } from './styles/adminPostFormstyle';
 
 
 export function AdminPostForm() {
@@ -25,6 +27,9 @@ export function AdminPostForm() {
   
   const [postId, setPostId] = useState(null);
   const [attachments, setAttachments] = useState([]);
+  const [postMedia, setPostMedia] = useState([]);
+  const [uploadingMedia, setUploadingMedia] = useState(false);
+  const [copiedMediaId, setCopiedMediaId] = useState(null);
 
   const [formData, setFormData] = useState({
     title: '',
@@ -77,6 +82,7 @@ export function AdminPostForm() {
           const post = await fetchPostBySlug(slug);
           setPostId(post.id);
           setAttachments(post.attachments || []);
+          setPostMedia(post.media || []);
 
           setFormData({
             title: post.title || '',
@@ -158,6 +164,7 @@ export function AdminPostForm() {
       subtype: formData.subtype || null,
       coverImage: formData.coverImage || null,
       allowComments: formData.allowComments,
+      mediaIds: postMedia.map(m => m.id),
     };
 
     if (selectedType === 'ADVOGADO') {
@@ -246,6 +253,52 @@ export function AdminPostForm() {
     } catch (err) {
       alert(err.message || 'Erro ao excluir anexo.');
     }
+  }
+
+  async function handleMediaUpload(e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    setUploadingMedia(true);
+    try {
+      const added = await uploadMedia(file, postId);
+      setPostMedia(prev => [...prev, added]);
+      const fileInput = document.getElementById('media-file-input');
+      if (fileInput) fileInput.value = '';
+    } catch (err) {
+      alert(err.message || 'Erro ao carregar arquivo.');
+    } finally {
+      setUploadingMedia(false);
+    }
+  }
+
+  async function handleMediaDelete(id) {
+    if (!window.confirm('Deseja excluir este arquivo permanentemente?')) return;
+    try {
+      await deleteMedia(id);
+      setPostMedia(prev => prev.filter(m => m.id !== id));
+    } catch (err) {
+      alert(err.message || 'Erro ao excluir arquivo.');
+    }
+  }
+
+  function handleCopyMediaUrl(id, url) {
+    navigator.clipboard.writeText(url)
+      .then(() => {
+        setCopiedMediaId(id);
+        setTimeout(() => setCopiedMediaId(null), 1500);
+      })
+      .catch(() => {
+        alert('Erro ao copiar URL.');
+      });
+  }
+
+  function formatBytes(bytes, decimals = 2) {
+    if (!+bytes) return '0 Bytes';
+    const k = 1024;
+    const dm = decimals < 0 ? 0 : decimals;
+    const sizes = ['Bytes', 'KB', 'MB', 'GB', 'TB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(dm))} ${sizes[i]}`;
   }
 
   if (loading) {
@@ -390,6 +443,85 @@ export function AdminPostForm() {
           />
           <Label htmlFor="allowComments" style={{ cursor: 'pointer' }}>Permitir comentários nesta publicação</Label>
         </CheckboxRow>
+
+        <div>
+          <SectionTitle>
+            <Paperclip size={18} /> Imagens e Arquivos PDF da Publicação
+          </SectionTitle>
+
+          <div style={{ background: 'var(--color-bg-secondary)', border: '1px dashed var(--color-border)', padding: '1rem', borderRadius: '6px', marginTop: '1rem' }}>
+            <h4 style={{ marginBottom: '0.8rem', fontSize: '0.95rem' }}>Fazer Upload de Imagem ou PDF</h4>
+            <FormRow>
+              <FormGroup>
+                <Label htmlFor="media-file-input">Selecionar Arquivo</Label>
+                <Input
+                  type="file"
+                  id="media-file-input"
+                  accept="image/*,application/pdf"
+                  onChange={handleMediaUpload}
+                  disabled={uploadingMedia}
+                />
+              </FormGroup>
+            </FormRow>
+            {uploadingMedia && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.5rem', color: 'var(--color-primary-blue)', fontSize: '0.85rem' }}>
+                <Loader size={16} style={{ animation: 'spin 1s linear infinite' }} />
+                <span>Enviando arquivo...</span>
+              </div>
+            )}
+          </div>
+
+          {postMedia.length > 0 ? (
+            <MediaCardList>
+              {postMedia.map(m => {
+                const isImage = m.type === 'IMAGE';
+                return (
+                  <MediaCardItem key={m.id}>
+                    <div style={{ display: 'flex', alignItems: 'center', gap: '0.8rem', minWidth: 0, flex: 1 }}>
+                      {isImage ? (
+                        <MediaThumbnail src={m.url} />
+                      ) : (
+                        <MediaIconWrapper>
+                          <FileText size={20} />
+                        </MediaIconWrapper>
+                      )}
+                      <div style={{ minWidth: 0 }}>
+                        <strong style={{ display: 'block', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+                          {m.originalName}
+                        </strong>
+                        <span style={{ fontSize: '0.75rem', color: 'var(--color-text-muted)' }}>
+                          {formatBytes(m.size)} | {new Date(m.createdAt).toLocaleDateString('pt-BR')}
+                        </span>
+                      </div>
+                    </div>
+                    <div style={{ display: 'flex', gap: '0.4rem', alignItems: 'center' }}>
+                      <Button 
+                        type="button" 
+                        onClick={() => handleCopyMediaUrl(m.id, m.url)}
+                        style={{ padding: '0.3rem 0.6rem', fontSize: '0.8rem' }}
+                      >
+                        {copiedMediaId === m.id ? 'Copiado!' : 'Copiar URL'}
+                      </Button>
+                      <ActionButton 
+                        type="button" 
+                        onClick={() => handleMediaDelete(m.id)}
+                        bg="#fee2e2" 
+                        color="var(--color-primary-red)"
+                        border="#fca5a5"
+                      >
+                        <Trash2 size={14} />
+                      </ActionButton>
+                    </div>
+                  </MediaCardItem>
+                );
+              })}
+            </MediaCardList>
+          ) : (
+            <p style={{ color: 'var(--color-text-muted)', fontSize: '0.85rem', marginTop: '0.5rem', fontStyle: 'italic' }}>
+              Nenhuma imagem ou PDF carregado para esta publicação.
+            </p>
+          )}
+        </div>
 
 
         {selectedType === 'ADVOGADO' && (

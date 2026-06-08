@@ -174,3 +174,42 @@ export const ActionButton = styled.button`
     background: ${props => props.hoverBg || 'var(--color-border)'};
   }
 `;
+
+export const MediaCardList = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: 0.6rem;
+  margin-top: 1rem;
+`;
+
+export const MediaCardItem = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background: var(--color-bg);
+  border: 1px solid var(--color-border);
+  padding: 0.6rem 0.8rem;
+  border-radius: 6px;
+  font-size: 0.85rem;
+  gap: 1rem;
+`;
+
+export const MediaThumbnail = styled.img`
+  width: 40px;
+  height: 40px;
+  object-fit: cover;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+`;
+
+export const MediaIconWrapper = styled.div`
+  width: 40px;
+  height: 40px;
+  background: #fdf2f2;
+  color: var(--color-primary-red);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-radius: 4px;
+  border: 1px solid var(--color-border);
+`;

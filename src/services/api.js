@@ -234,4 +234,34 @@ export async function deleteAttachment(id) {
   return data;
 }
 
+export async function uploadMedia(file, postId) {
+  const token = localStorage.getItem('token');
+  const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+  const formData = new FormData();
+  formData.append('file', file);
+  if (postId) {
+    formData.append('postId', postId);
+  }
+  const response = await fetch(`${BASE_URL}/media/upload`, {
+    method: 'POST',
+    headers: {
+      ...authHeaders,
+    },
+    body: formData,
+  });
+  const data = await response.json();
+  if (!response.ok) {
+    throw new Error(data.message || `Erro ${response.status}`);
+  }
+  return data.data;
+}
+
+export async function deleteMedia(id) {
+  const data = await request(`/media/${id}`, {
+    method: 'DELETE',
+  });
+  return data;
+}
+
+
 
