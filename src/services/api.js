@@ -59,6 +59,14 @@ export async function likePost(postId) {
   return data.data;
 }
 
+/**
+ * @param {string} postId
+ */
+export async function unlikePost(postId) {
+  const data = await request(`/posts/${postId}/unlike`, { method: 'POST' });
+  return data.data;
+}
+
 
 /**
  * @param {string} postId

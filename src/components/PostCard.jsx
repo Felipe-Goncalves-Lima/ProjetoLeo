@@ -3,7 +3,7 @@ import styled from 'styled-components';
 import { Link, useNavigate } from 'react-router-dom';
 import { MessageCircle, ThumbsUp, Share2, Edit2, Trash2 } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
-import { deletePost } from '../services/api';
+import { deletePost, likePost, unlikePost } from '../services/api';
 import {
   Card,
   PostHeader,
@@ -22,8 +22,16 @@ import ShareButton from './sharebutton';
 export function PostCard({ post }) {
   const navigate = useNavigate();
   const { user, isAuthenticated } = useAuth();
-  const [liked, setLiked] = useState(false);
+  const [liked, setLiked] = useState(() => {
+    try {
+      const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+      return likedPosts.includes(post.id);
+    } catch {
+      return false;
+    }
+  });
   const [likesCount, setLikesCount] = useState(post.likes ?? 0);
+  const [likingLoading, setLikingLoading] = useState(false);
 
   const categorySlug = typeof post.category === 'object' ? post.category?.slug : post.category;
   const categoryName = typeof post.category === 'object' ? post.category?.name : post.category;
@@ -31,6 +39,39 @@ export function PostCard({ post }) {
   const postDate = post.createdAt || post.date;
   const commentsCount = post._count?.comments ?? post.comments?.length ?? 0;
   const postUrl = `/${categorySlug}/${post.slug}`;
+
+  async function handleLike(e) {
+    e.preventDefault();
+    e.stopPropagation();
+    if (likingLoading) return;
+    setLikingLoading(true);
+    try {
+      if (liked) {
+        const updated = await unlikePost(post.id);
+        setLikesCount(updated.likes);
+        setLiked(false);
+        try {
+          const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+          const updatedLikedPosts = likedPosts.filter(id => id !== post.id);
+          localStorage.setItem('liked_posts', JSON.stringify(updatedLikedPosts));
+        } catch {}
+      } else {
+        const updated = await likePost(post.id);
+        setLikesCount(updated.likes);
+        setLiked(true);
+        try {
+          const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+          if (!likedPosts.includes(post.id)) {
+            likedPosts.push(post.id);
+            localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+          }
+        } catch {}
+      }
+    } catch {
+    } finally {
+      setLikingLoading(false);
+    }
+  }
 
   return (
     <Card>
@@ -52,11 +93,10 @@ export function PostCard({ post }) {
 
       <InteractionBar>
         <InteractionButton
-          onClick={() => {
-            setLiked(!liked);
-            setLikesCount(prev => liked ? prev - 1 : prev + 1);
-          }}
-          style={{ color: liked ? '#E63946' : 'var(--color-text-muted)' }}
+          onClick={handleLike}
+          disabled={likingLoading}
+          style={{ color: liked ? '#E63946' : 'var(--color-text-muted)', cursor: likingLoading ? 'default' : 'pointer' }}
+          title={liked ? 'Remover curtida' : 'Curtir publicação'}
         >
           <ThumbsUp size={18} />
           {likesCount}

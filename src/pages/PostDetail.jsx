@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { useParams, Link, useNavigate, useLocation } from 'react-router-dom';
 import { Helmet } from 'react-helmet-async';
 import styled from 'styled-components';
-import { fetchPostBySlug, likePost, postComment, deleteComment, updateComment, deletePost } from '../services/api';
+import { fetchPostBySlug, likePost, unlikePost, postComment, deleteComment, updateComment, deletePost } from '../services/api';
 import { ArrowLeft, MessageCircle, Share2, ThumbsUp, Send, Loader, LogIn, Edit2, Trash2, Check, X, FileText } from 'lucide-react';
 import { useAuth } from '../contexts/AuthContext';
 
@@ -343,6 +343,7 @@ export function PostDetail() {
 
   useEffect(() => {
     let cancelled = false;
+    setLiked(false);
 
     async function load() {
       setLoading(true);
@@ -353,6 +354,12 @@ export function PostDetail() {
           setPost(data);
           setLikes(data.likes || 0);
           setLocalComments(data.comments || []);
+          try {
+            const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+            if (likedPosts.includes(data.id)) {
+              setLiked(true);
+            }
+          } catch {}
         }
       } catch (err) {
         if (!cancelled) {
@@ -368,12 +375,30 @@ export function PostDetail() {
   }, [slug]);
 
   async function handleLike() {
-    if (liked || likingLoading) return;
+    if (likingLoading) return;
     setLikingLoading(true);
     try {
-      const updated = await likePost(post.id);
-      setLikes(updated.likes);
-      setLiked(true);
+      if (liked) {
+        const updated = await unlikePost(post.id);
+        setLikes(updated.likes);
+        setLiked(false);
+        try {
+          const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+          const updatedLikedPosts = likedPosts.filter(id => id !== post.id);
+          localStorage.setItem('liked_posts', JSON.stringify(updatedLikedPosts));
+        } catch {}
+      } else {
+        const updated = await likePost(post.id);
+        setLikes(updated.likes);
+        setLiked(true);
+        try {
+          const likedPosts = JSON.parse(localStorage.getItem('liked_posts') || '[]');
+          if (!likedPosts.includes(post.id)) {
+            likedPosts.push(post.id);
+            localStorage.setItem('liked_posts', JSON.stringify(likedPosts));
+          }
+        } catch {}
+      }
     } catch {
     } finally {
       setLikingLoading(false);
@@ -622,9 +647,9 @@ export function PostDetail() {
         <InteractionBar>
           <InteractionButton
             onClick={handleLike}
-            disabled={liked || likingLoading}
+            disabled={likingLoading}
             $active={liked}
-            title={liked ? 'Já curtiu!' : 'Curtir publicação'}
+            title={liked ? 'Remover curtida' : 'Curtir publicação'}
           >
             <ThumbsUp size={18} /> {likes}
           </InteractionButton>
