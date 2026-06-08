@@ -102,7 +102,14 @@ export function PostCard({ post }) {
           {likesCount}
         </InteractionButton>
 
-        <InteractionButton>
+        <InteractionButton
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            navigate(`${postUrl}#comments`);
+          }}
+          title="Ver comentários"
+        >
           <MessageCircle size={18} />
           {commentsCount}
         </InteractionButton>

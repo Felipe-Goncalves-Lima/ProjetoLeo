@@ -374,6 +374,22 @@ export function PostDetail() {
     return () => { cancelled = true; };
   }, [slug]);
 
+  useEffect(() => {
+    if (!loading && post && location.hash === '#comments') {
+      const timer = setTimeout(() => {
+        const element = document.getElementById('comments');
+        if (element) {
+          element.scrollIntoView({ behavior: 'smooth' });
+          const textarea = document.getElementById('content');
+          if (textarea) {
+            textarea.focus();
+          }
+        }
+      }, 100);
+      return () => clearTimeout(timer);
+    }
+  }, [loading, post, location.hash]);
+
   async function handleLike() {
     if (likingLoading) return;
     setLikingLoading(true);
@@ -432,11 +448,12 @@ export function PostDetail() {
       : { authorName: commentForm.authorName, authorEmail: commentForm.authorEmail, content: commentForm.content };
 
     try {
-      await postComment(post.id, payload);
+      const response = await postComment(post.id, payload);
       setCommentFeedback({
         type: 'success',
-        message: 'Comentário enviado! Ele ficará visível após aprovação.',
+        message: 'Comentário publicado com sucesso!',
       });
+      setLocalComments(prev => [...prev, response]);
       setCommentForm({ authorName: '', authorEmail: '', content: '' });
     } catch (err) {
       setCommentFeedback({ type: 'error', message: err.message || 'Erro ao enviar comentário.' });
@@ -661,7 +678,7 @@ export function PostDetail() {
           </InteractionButton>
         </InteractionBar>
 
-        <CommentsSection>
+        <CommentsSection id="comments">
           <h3>Comentários ({localComments.length})</h3>
           <div style={{ marginTop: '1.5rem' }}>
             {localComments.length > 0 ? (
@@ -773,6 +790,7 @@ export function PostDetail() {
                     placeholder="Escreva seu comentário..."
                     value={commentForm.content}
                     onChange={handleCommentChange}
+                    autoFocus={location.hash === '#comments'}
                   />
                 </FormGroup>
 
