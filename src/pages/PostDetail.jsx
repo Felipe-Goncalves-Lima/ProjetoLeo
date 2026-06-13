@@ -554,7 +554,19 @@ export function PostDetail() {
         if (window.history.state && window.history.state.idx > 0) {
           navigate(-1);
         } else {
-          navigate(category ? `/${category}` : '/');
+          const catType = post?.category?.type;
+          const catSlug = post?.category?.slug || '';
+          
+          if (catType === 'POETA' || catSlug.includes('poesia') || catSlug.includes('musica')) {
+            const tab = catSlug.includes('musica') ? 'musica' : 'poesia';
+            navigate('/poeta', { state: { tab } });
+          } else if (catType === 'ADVOGADO' || catSlug === 'advogado') {
+            navigate('/advogado');
+          } else if (catType === 'PROFESSOR' || catSlug === 'professor') {
+            navigate('/professor');
+          } else {
+            navigate('/');
+          }
         }
       }}>
         <ArrowLeft size={18} /> Voltar

@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Helmet } from 'react-helmet-async';
+import { useLocation } from 'react-router-dom';
 import { PageHeader, Tabs, TabButton, SoundCloudPlaceholder } from './styles/poetaStyle.jsx';
 import { Feed } from '../components/Feed';
 import { usePosts } from '../hooks/usePosts';
@@ -8,7 +9,10 @@ import { PenTool, Music, Book } from 'lucide-react';
 
 
 export function Poeta() {
-  const [activeTab, setActiveTab] = useState('poesia');
+  const location = useLocation();
+  const [activeTab, setActiveTab] = useState(() => {
+    return (location.state && location.state.tab) || 'poesia';
+  });
 
   const { posts, loading, error } = usePosts({ categoryType: 'POETA' });
 
