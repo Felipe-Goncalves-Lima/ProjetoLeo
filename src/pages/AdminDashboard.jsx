@@ -2,7 +2,7 @@ import React, { useState, useEffect } from 'react';
 import { Link, useNavigate } from 'react-router-dom';
 import { fetchPosts, deletePost, updatePostStatus } from '../services/api';
 import { Plus, Search, Edit2, Trash2, Loader, Eye, CheckCircle2, AlertCircle, FileText, ArrowLeft } from 'lucide-react';
-import { DashboardContainer, HeaderRow, Title, CreateButton, SearchBar, SearchIconWrapper, SearchInput, TableWrapper, Table, Th, Td, CategoryBadge, Badge, ActionGroup, ActionButton, LoadingWrapper, PostTitleLink } from './styles/adminDashboardstyle';
+import { DashboardContainer, HeaderRow, Title, CreateButton, SearchBar, SearchIconWrapper, SearchInput, TableWrapper, Table, Th, Td, CategoryBadge, Badge, ActionGroup, ActionButton, LoadingWrapper, PostTitleLink, EmptyState } from './styles/adminDashboardstyle';
 
 
 export function AdminDashboard() {

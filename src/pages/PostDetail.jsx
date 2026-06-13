@@ -540,6 +540,7 @@ export function PostDetail() {
   const categoryName = post.category?.name || post.category?.slug || category;
 
   const images = post.media?.filter(m => m.type === 'IMAGE') || [];
+  const videos = post.media?.filter(m => m.type === 'VIDEO') || [];
   const pdfs = post.media?.filter(m => m.type === 'PDF') || [];
 
   return (
@@ -631,6 +632,14 @@ export function PostDetail() {
         {images.map(img => (
           <div key={img.id} style={{ marginBottom: '2rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)', textAlign: 'center', background: 'var(--color-bg-secondary)' }}>
             <img src={img.url} alt={img.originalName} style={{ display: 'block', margin: '0 auto', maxHeight: '600px', maxWidth: '100%', objectFit: 'contain' }} />
+          </div>
+        ))}
+
+        {videos.map(vid => (
+          <div key={vid.id} style={{ marginBottom: '2rem', borderRadius: '8px', overflow: 'hidden', border: '1px solid var(--color-border)', textAlign: 'center', background: 'var(--color-bg-secondary)', padding: '1rem' }}>
+            <video src={vid.url} controls style={{ display: 'block', margin: '0 auto', maxHeight: '500px', maxWidth: '100%', borderRadius: '4px' }}>
+              Seu navegador não suporta a reprodução de vídeos.
+            </video>
           </div>
         ))}
 

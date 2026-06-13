@@ -10,11 +10,17 @@ import { PenTool, Music, Book } from 'lucide-react';
 export function Poeta() {
   const [activeTab, setActiveTab] = useState('poesia');
 
-  const { posts, loading, error } = usePosts(
-    activeTab === 'poesia'
-      ? { categoryType: 'POETA', subtype: 'Poesia' }
-      : { categoryType: 'POETA', subtype: 'Música' }
-  );
+  const { posts, loading, error } = usePosts({ categoryType: 'POETA' });
+
+  const filteredPosts = posts.filter(post => {
+    const categorySlug = typeof post.category === 'object' ? post.category?.slug : post.category;
+    if (!categorySlug) return false;
+    if (activeTab === 'poesia') {
+      return categorySlug.includes('poesia');
+    } else {
+      return categorySlug.includes('musica');
+    }
+  });
 
   return (
     <div>
@@ -43,14 +49,7 @@ export function Poeta() {
         </TabButton>
       </Tabs>
 
-      {activeTab === 'musica' && (
-        <SoundCloudPlaceholder>
-          [Área reservada para Iframe do SoundCloud]<br />
-          As músicas serão integradas diretamente do SoundCloud aqui para reprodução na página.
-        </SoundCloudPlaceholder>
-      )}
-
-      <Feed posts={posts} loading={loading} error={error} />
+      <Feed posts={filteredPosts} loading={loading} error={error} />
     </div>
   );
 }

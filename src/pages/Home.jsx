@@ -31,7 +31,7 @@ export function Home() {
           na condição de Procurador Federal da Advocacia Geral da União-AGU, vindo ampliando continuamente
           sua participação acadêmica, social e cultural, como Professor e Poeta (Arte) <br /><br />
           <span style={{ color: '#E63946', marginRight: '119px' }}><strong>Meu lattes:</strong> <a href="https://lattes.cnpq.br/4791462285750057" target="_blank">Lattes Leonardo Caffaro (clique aqui)</a></span><br />
-          <span style={{ color: '#E63946', marginRight: '120px' }}><strong>Meu Orcid: </strong><a href="https://orcid.org/0009-0006-9960-6556" target="_blank">Orcid: Leonardo Caffaro (clique aqui)</a></span>
+          <span style={{ color: '#E63946', marginRight: '120px' }}><strong>Meu Orcid: </strong><a href="https://orcid.org/0009-0006-9960-6556" target="_blank">Orcid Leonardo Caffaro (clique aqui)</a></span>
         </Bio>
       </ProfileSection>
 

@@ -3,20 +3,23 @@ const BASE_URL = import.meta.env.VITE_API_URL || '/api';
 async function request(path, options = {}) {
   const token = localStorage.getItem('token');
   const authHeaders = token ? { 'Authorization': `Bearer ${token}` } : {};
+  const { headers, ...restOptions } = options;
 
   const response = await fetch(`${BASE_URL}${path}`, {
     headers: {
       'Content-Type': 'application/json',
       ...authHeaders,
-      ...options.headers,
+      ...headers,
     },
-    ...options,
+    ...restOptions,
   });
 
   const data = await response.json();
 
   if (!response.ok) {
-    throw new Error(data.message || `Erro ${response.status}`);
+    const error = new Error(data.message || `Erro ${response.status}`);
+    error.errors = data.errors;
+    throw error;
   }
 
   return data;
