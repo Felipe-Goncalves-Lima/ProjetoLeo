@@ -22,7 +22,8 @@ import { StyledDialog } from "./style/shareModalstyle";
 export default function ShareModal({ open, onClose, post }) {
   const [copied, setCopied] = useState(false);
 
-  const currentUrl = `${window.location.origin}/${post.category}/${post.slug}`;
+  const categorySlug = typeof post.category === 'object' ? post.category?.slug : post.category;
+  const currentUrl = `${window.location.origin}/${categorySlug}/${post.slug}`;
 
   const copyLink = async () => {
     await navigator.clipboard.writeText(currentUrl);

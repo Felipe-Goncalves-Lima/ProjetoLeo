@@ -24,21 +24,30 @@ import capaLivro2 from '../assets/capaLivro2.png'
 const initialBooks = [
   { 
     id: 1,
-    title: 'Temas Emergentes em Ciências Sociais Aplicadas',
+    title: 'Temas Emergentes em Ciências Sociais Aplicadas.',
     publisher: 'Dialética Editora',
-    description: 'Uma Abordagem Multidisciplinar',
+    description: 'Uma Abordagem Multidisciplinar.',
     coverImage: capaLivro1,
     buyLink: '#',
     pdfUrl: '/9786528800056_NUVEM_260331_181312.pdf',
   },
   {
     id: 2,
-    title: 'O Pós-Positivismo Como Expressão Do Direito Ético',
+    title: 'O Pós-Positivismo Como Expressão Do Direito Ético.',
     publisher: 'All Print Editora',
-    description: 'Discussões complementares de direito e sociologia jurídica aplicadas ao ensino acadêmico.',
+    description: 'O Direito Como Experiência (Historicidade Da Positivação) E Legítimas Expectativas De Normatividade (Comunicação Normativa).',
     coverImage: capaLivro2,
     buyLink: '#',
     pdfUrl: '/9786525474507_NUVEM_260307_161331.pdf',
+  },
+  {
+    id: 3,
+    title: 'A Função Constitucional E Democrática Da Advogacia Pública E Sua Essencialidade Ético-Jurídica',
+    publisher: 'Migalhas',
+    description: 'Uma Breve Síntese.',
+    coverImage: '',
+    buyLink: '#',
+    pdfUrl: 'https://www.migalhas.com.br/depeso/430103/a-funcao-constitucional-e-democratica-da-advocacia-publica',
   }
 ];
 
